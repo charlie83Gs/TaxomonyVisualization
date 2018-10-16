@@ -17,6 +17,7 @@ var initOptions = {
     "stroke-color" : undefined,
     "hover-color" : undefined,
     "hover-color-rect" : undefined,
+	"text-color": undefined
 }
 
 
@@ -80,7 +81,9 @@ function setup() {
 	initOptions["background-color"] = color(255,180,40);
 	initOptions["stroke-color"] = color(0,0,0);
 	initOptions["hover-color"] = color(249,211,149);
+	initOptions["text-color"] = color(0,0,0);
 	initOptions["hover-color-rect"] = color(48, 44, 66);
+	
   
 	countChildren(tree);
 	levelList = createRankList(tree);
@@ -113,8 +116,8 @@ function windowResized() {
 
 function draw() {
   translate(xPointer,-yPointer);
-  background(80);
-  fill(255);
+  background(255);
+  fill(0);
 
   //drawIndentedTree(tree, initOptions);
   optimizedDrawIndentedTree(tree.visible_lbr,initOptions,0,0);
@@ -353,7 +356,7 @@ function optimizedDrawIndentedTree(listByRank,options,xpos,ypos){
 	colorMode(RGB, 255);
 	
 	}
-	
+
 function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 	if(taxons.length <= 0) return;
 	let initial = findHead(taxons,pointer);
@@ -368,8 +371,10 @@ function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 		if(node.f.length <= 0 || !node.f[node.f.length-1].collapsed){
 			draws++;
 			fill(iniColor,0,iniBrigthnes);
-			drawCutNode(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
+			//drawCutNode(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
 			drawOnlyText(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
+			//drawInside(node, xpos,ypos, options);
+			drawIndent(node, xpos,ypos, options);
 			//drawNode(node,options);
 			//drawNode(node,options)
 
@@ -421,6 +426,7 @@ function isOnScreen(node,yScreenPos,screenHeight){
 function drawOnlyText(node,initialY,finalY,options,xpos,ypos){
 	let clicked = false;
 	//hover interaction
+	fill(options["text-color"]);
 	if(isOverRect(mouseX +xPointer, mouseY+yPointer,node.x + xpos,node.y + ypos,node.width,options.defaultSize)){
 		fill(options["hover-color"]);
 		if(click && !changed){
@@ -450,7 +456,7 @@ function drawOnlyText(node,initialY,finalY,options,xpos,ypos){
 
 	}
 
-
+	noStroke();
 	if(node.y >= initialY && node.y <= finalY){
 		text(node.n + " " + node.totalSpecies,node.x +5 +xpos,node.y+15);
 	}
@@ -528,7 +534,7 @@ function drawNode(node,options){
 	fill(0);
 	text(node.n,node.x +5 ,node.y+15);
 }
-
+/*
 function drawNode(node,options){
 	//console.log(node.x+"--"+node.y+"--"+node.width+"--"+node.height );
 	fill(options["background-color"]);
@@ -539,7 +545,29 @@ function drawNode(node,options){
 	fill(0);
 	text(node.n,node.x +5 ,node.y+15);
 }
+*/
 
+function drawInside(node,xpos,ypos,options){
+	//console.log(node.x+"--"+node.y+"--"+node.width+"--"+node.height );
+	stroke(options["stroke-color"]);
+	noFill();
+	if(!node.collapsed){
+		rect(node.x + xpos,node.y +ypos + options.defaultSize,node.width,node.height - options.defaultSize);
+	}else{
+		rect(node.x + xpos /*- options.indent*/,node.y +ypos ,node.width /*+ options.indent*/,node.height);
+	}
+}
+
+function drawIndent(node,xpos,ypos,options){
+	stroke(options["stroke-color"]);
+	if(node.f.length > 0){
+	let parentNode = node.f[node.f.length -  1];
+	let defaultYDisp = options.defaultSize/2 + ypos;
+	line(parentNode.x + xpos, node.y + defaultYDisp, node.x + xpos, node.y + defaultYDisp);
+	line(parentNode.x + xpos, parentNode.y + defaultYDisp, parentNode.x + xpos, node.y + defaultYDisp);
+	
+	}
+}
 
 function drawCutNode(node,initialY,finalY,options,xpos,ypos){
 	//console.log(node.x+"--"+node.y+"--"+node.width+"--"+node.height );
