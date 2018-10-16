@@ -234,7 +234,7 @@ function moveSubtree(subtree, xmove, ymove){
   //proccesByLevel(root,function(node){addParameterToNode(node,"total"+rank,0,"kingdom",higerRank)});
 function countChildren(root){
   //adds procesed to every element of the tree
-  proccesByLevel(root,function(node){addParameterToNode(node,"desendece",0,"Species","Domain")});
+  proccesByLevel(root,function(node){node.desendece = 0;});
   memoryTreeIteration(root,disperceChildCount);
   
   memoryTreeIteration(root,setFamiliars);
