@@ -41,11 +41,21 @@ body {
     font-size: 6pt;
     background-color: #7DB343;	
 }
+.vis_button{
+    position:  absolute;
+    top: 3%;
+    right: 10%;
+    font-size: 15pt;
+    background-color: rgba(0,0,0,0);
+    display: inline-block;
+    border-radius: 5px;
+}
 
 .button2{
 	margin-left: -55px;
 
 }
+
 
 p{
 	margin-top: 18%;

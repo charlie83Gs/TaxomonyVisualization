@@ -5,10 +5,16 @@ var ranks = {
   "phylum" : 2,
   "class" : 3,
   "order" : 4,
-  "family" : 5,
-  "genus" : 6,
-  "species" : 7,
-  "Infraspecies":8
+  "superfamily" : 5,
+  "family" : 6,
+  "subfamily" : 6.5,
+  "tribe" : 6.5,
+  "subtribe" : 6.6,
+  "genus" : 7,
+  "subgenus" : 7.5,
+  "species" : 8,
+  "infraspecies":9,
+  "subpecies":9
   
 };
 
@@ -199,21 +205,29 @@ function setFamiliars(node, parentNodes){
 
 }
 function populateRankList(node, ranklist){
+  console.log(node.r.toLowerCase());
 	node.listPosition = ranklist[node.r.toLowerCase()].length;
 	ranklist[node.r.toLowerCase()].push(node);
 	}
 
 function createRankList(treeRoot){
 		let ranklist = {
-			"domain" : 	[],
-			"kingdom": 	[],
-			"phylum" : 	[],
-			"class" : 	[],
-			"order" : 	[],
-			"family" : 	[],
-			"genus" : 	[],
-			"species" : [],
-      "infraspecies":[],
+      "domain" :        [],
+      "kingdom":        [],
+      "phylum" :        [],
+      "class" :         [],
+      "order" :         [],
+      "superfamily" :   [],
+      "family" :        [],
+      "subfamily" :     [],
+      "tribe" :         [],
+      "subtribe" :      [],
+      "genus" :         [],
+      "subgenus" :      [],
+      "species" :       [],
+      "infraspecies":   [],
+      "subpecies":      [],
+  
 			};
 		
 		proccesByLevel(treeRoot,function(node){populateRankList(node,ranklist)});

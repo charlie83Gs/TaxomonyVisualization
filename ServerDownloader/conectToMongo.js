@@ -1,5 +1,5 @@
 var MongoClient = require('mongodb').MongoClient,format=require('util').format;
-
+var path = require('path');
 const NodeCache = require( "node-cache" );
 const taxCache = new NodeCache();
 
@@ -162,6 +162,6 @@ function buildTreeTax(taxonomie,name,res){
 //buildTreeTax("Apus_2018","Apus");
 
 //consult("Apus_2018","Apus acuticauda");
-readFiles('C:\\Users\\Andre\\Documents\\TEC\\Beca\\Downloader\\DownloaderTax\\ServerDownloader\\Taxonomies\\',function(){},function(){});
+readFiles(path.join(__dirname, 'Taxonomies/'),function(){},function(){});
 
 module.exports.buildTreeTax = buildTreeTax;
