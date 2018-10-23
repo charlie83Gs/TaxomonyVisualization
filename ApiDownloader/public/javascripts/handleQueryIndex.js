@@ -17,7 +17,13 @@ tree.setLog(function(logContent){
 	}
 );*/
 
+const loadingUrl = "http://localhost:3000/";
 
+
+
+function onSalir(){
+	window.location.replace(loadingUrl);
+}
 
 $(function () {
     $("#searchButton").click(function ()

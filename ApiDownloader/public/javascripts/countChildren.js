@@ -14,7 +14,7 @@ var ranks = {
   "subgenus" : 7.5,
   "species" : 8,
   "infraspecies":9,
-  "subpecies":9
+  "subspecies":9
   
 };
 
@@ -205,7 +205,7 @@ function setFamiliars(node, parentNodes){
 
 }
 function populateRankList(node, ranklist){
-  console.log(node.r.toLowerCase());
+  //console.log(node.r.toLowerCase());
 	node.listPosition = ranklist[node.r.toLowerCase()].length;
 	ranklist[node.r.toLowerCase()].push(node);
 	}
@@ -226,7 +226,7 @@ function createRankList(treeRoot){
       "subgenus" :      [],
       "species" :       [],
       "infraspecies":   [],
-      "subpecies":      [],
+      "subspecies":      [],
   
 			};
 		

@@ -13,7 +13,6 @@ if(!tree || !tree2){
 	window.location.replace(loadingUrl);
 }
 
-
 var initOptions = {
     defaultSize : 20,
     indent : 30,
@@ -24,10 +23,13 @@ var initOptions = {
     hsbbrigthnesIncrement: 7,
     log_increment: 8,
     log_scale: 5,
+    "hierarchy_distance":500,
     "width" : 300,
     "height" : 500,
     "background-color" : undefined,
     "stroke-color" : undefined,
+    "indent-stroke" : 0.5,
+    "indent-stroke-color" : undefined,
     "hover-color" : undefined,
     "hover-color-rect" : undefined,
 	"text-color": undefined
@@ -53,28 +55,42 @@ var changed = false;
 var click = false;
 
 tree.visible_lbr = {
-	"domain" : 	[],
-	"kingdom": 	[],
-	"phylum" : 	[],
-	"class" : 	[],
-	"order" : 	[],
-	"family" : 	[],
-	"genus" : 	[],
-	"species" : [],
-     "infraspecies":[]
-}
+      "domain" :        [],
+      "kingdom":        [],
+      "phylum" :        [],
+      "class" :         [],
+      "order" :         [],
+      "superfamily" :   [],
+      "family" :        [],
+      "subfamily" :     [],
+      "tribe" :         [],
+      "subtribe" :      [],
+      "genus" :         [],
+      "subgenus" :      [],
+      "species" :       [],
+      "infraspecies":   [],
+      "subspecies":      [],
+  
+};
 
 tree2.visible_lbr = {
-	"domain" : 	[],
-	"kingdom": 	[],
-	"phylum" : 	[],
-	"class" : 	[],
-	"order" : 	[],
-	"family" : 	[],
-	"genus" : 	[],
-	"species" : [],
-     "infraspecies":[]
-}
+      "domain" :        [],
+      "kingdom":        [],
+      "phylum" :        [],
+      "class" :         [],
+      "order" :         [],
+      "superfamily" :   [],
+      "family" :        [],
+      "subfamily" :     [],
+      "tribe" :         [],
+      "subtribe" :      [],
+      "genus" :         [],
+      "subgenus" :      [],
+      "species" :       [],
+      "infraspecies":   [],
+      "subspecies":      [],
+  
+};
 
 
 
@@ -93,6 +109,7 @@ function setup() {
 	//setup optiopns that cannot be initialized before setup
 	initOptions["background-color"] = color(255,180,40);
 	initOptions["stroke-color"] = color(0,0,0);
+	initOptions["indent-stroke-color"] = color(80,80,80);
 	initOptions["hover-color"] = color(249,211,149);
 	initOptions["text-color"] = color(0,0,0);
 	initOptions["hover-color-rect"] = color(48, 44, 66);
@@ -106,9 +123,11 @@ function setup() {
 	levelList2 = createRankList(tree2);
 	initializeIndentedTree(tree2,levelList2,initOptions);
 	
+	calculate_all_merges(levelList,levelList2);
+
 	
-	console.log(tree);
-	console.log(levelList);
+	//console.log(tree);
+	//console.log(levelList);
   
 }
 function mouseWheel(event) {
@@ -133,12 +152,14 @@ function draw() {
   fill(0);
 
   //drawIndentedTree(tree, initOptions);
-  optimizedDrawIndentedTree(tree.visible_lbr,initOptions,0,0);
-  optimizedDrawIndentedTree(tree2.visible_lbr,initOptions,windowWidth-300,0);
+  let base_y = windowWidth/2 - initOptions.width/2;
+  optimizedDrawIndentedTree(tree.visible_lbr,initOptions,base_y-initOptions.hierarchy_distance/2,0);
+  optimizedDrawIndentedTree(tree2.visible_lbr,initOptions,base_y+initOptions.hierarchy_distance/2,0);
 
 	//initOptions.hsbColor = (initOptions.hsbColor +2);
   //console.log(mouseX +"---"+mouseY);
   
+
 
   click = false;
 }
@@ -366,9 +387,14 @@ function optimizedDrawIndentedTree(listByRank,options,xpos,ypos){
 	drawHierarchyLevel(phylum,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(tclass,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(order,options,yPointer,xpos,ypos);
+	drawHierarchyLevel(superfamily,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(family,options,yPointer,xpos,ypos);
+	drawHierarchyLevel(subfamily,options,yPointer,xpos,ypos);
+	drawHierarchyLevel(tribe,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(genus,options,yPointer,xpos,ypos);
+	drawHierarchyLevel(subgenus,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(species,options,yPointer,xpos,ypos);
+	drawHierarchyLevel(subspecies,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(infraspecies,options,yPointer,xpos,ypos);
 	colorMode(RGB, 255);
 	
@@ -390,8 +416,8 @@ function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 			fill(iniColor,0,iniBrigthnes);
 			//drawCutNode(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
 			drawOnlyText(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
-			//drawInside(node, xpos,ypos, options);
-			drawIndent(node, xpos,ypos, options);
+			drawInside(node, xpos,ypos, options);
+			//fdrawIndent(node, xpos,ypos, options);
 			//drawNode(node,options);
 			//drawNode(node,options)
 
@@ -570,14 +596,15 @@ function drawInside(node,xpos,ypos,options){
 	stroke(options["stroke-color"]);
 	noFill();
 	if(!node.collapsed){
-		rect(node.x + xpos,node.y +ypos + options.defaultSize,node.width,node.height - options.defaultSize);
+		rect(node.x + xpos +options.indent,node.y +ypos + options.defaultSize,node.width-options.indent,node.height - options.defaultSize);
 	}else{
-		rect(node.x + xpos /*- options.indent*/,node.y +ypos ,node.width /*+ options.indent*/,node.height);
+		//rect(node.x + xpos /*- options.indent*/,node.y +ypos ,node.width /*+ options.indent*/,node.height);
 	}
 }
 
 function drawIndent(node,xpos,ypos,options){
-	stroke(options["stroke-color"]);
+	stroke(options["indent-stroke-color"]);
+	strokeWeight(options["indent-stroke"]);
 	if(node.f.length > 0){
 	let parentNode = node.f[node.f.length -  1];
 	let defaultYDisp = options.defaultSize/2 + ypos;
