@@ -24,7 +24,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
-app.get('/search', function(req, res) {
+app.post('/search', function(req, res) {
   //res.send('ab?cd');
   let tax = req.query.tax;
   let name = req.query.name;

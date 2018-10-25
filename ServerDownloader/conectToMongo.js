@@ -93,17 +93,19 @@ function insert(jsonTaxon,filename,db){
 
 function consult(taxonomie,name,stats){
   //console.log(stats);
-  MongoClient.connect(url, function(err, db) {
-    if (err) {
+  console.log(`Consulta en ${taxonomie} buscando ${name}`);
+  MongoClient.connect(url,{connectTimeoutMS:20000,socketTimeoutMS:20000}, function(err, db) {
+	if (err) {
       console.log(stats);
       throw err;
       console.log(err);
     }
+	
     var dbo = db.db("downloaderTax");
       dbo.collection(taxonomie).findOne({"n" : name}, function(err, result) {
       if (err){
         throw err;
-        console.log("segundo if");
+        console.log("error en consulta a bd");
       } 
       //console.log(stats.completeJobs);
      //console.log(result);
@@ -112,7 +114,7 @@ function consult(taxonomie,name,stats){
       stats.completeJobs++;
       stats.pendingJobs--;
       let children = result.c;
-
+	  console.log(result);
       for(let childIndex = 0;childIndex < children.length;childIndex++){
         stats.pendingJobs++;
         consult(taxonomie,children[childIndex].n,stats);
@@ -139,19 +141,20 @@ function consultTree(taxonomie,name,stats,intervalObj,res){
 function buildTaxon(pending){
   //console.log(taxCache);
   let actual = taxCache.get(pending.pop());
-      let children = actual.c;
-      let newChildren = [];
-      for(let i = 0;i < children.length ;i++){
-        children[i] = taxCache.get(children[i].n);
-        pending.unshift(children[i].n);
-      }
+  console.log(actual);
+  let children = actual.c;
+  let newChildren = [];
+  for(let i = 0;i < children.length ;i++){
+    children[i] = taxCache.get(children[i].n);
+    pending.unshift(children[i].n);
+  }
   return actual;
 }
 
 
 function buildTreeTax(taxonomie,name,res){
   //console.log(name);
-  let stats = {pendingJobs:0,completeJobs:0};
+  let stats = {pendingJobs:1,completeJobs:0};
   consult(taxonomie,name,stats);
   let intervalObj = setInterval(() => {
   consultTree(taxonomie,name,stats,intervalObj,res);
@@ -159,9 +162,37 @@ function buildTreeTax(taxonomie,name,res){
 
 }
 
+function showCollections(){
+  console.log('Taxonomy names listing');
+  let arrayNames = [];
+  MongoClient.connect(url,{connectTimeoutMS:20000,socketTimeoutMS:20000}, function(err, db) {
+	if (err) {
+      console.log(stats);
+      throw err;
+      console.log(err);
+    }
+	
+    var dbo = db.db("downloaderTax");
+    dbo.listCollections().toArray(function(err, result) {
+	  if (err){
+        throw err;
+        console.log("Error consulting the DB");
+      }
+	  for (var i = 0; i < result.length; i++){
+		arrayNames[i] = result[i].name;
+	  }
+	  //console.log(arrayNames);
+      db.close();
+    });
+  });
+  //console.log(arrayNames);
+  return arrayNames;
+}
+
 //buildTreeTax("Apus_2018","Apus");
 
 //consult("Apus_2018","Apus acuticauda");
+console.log(showCollections());
 readFiles(path.join(__dirname, 'Taxonomies/'),function(){},function(){});
 
 module.exports.buildTreeTax = buildTreeTax;
