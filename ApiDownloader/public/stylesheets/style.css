@@ -10,7 +10,7 @@ body {
 	font-family: 'Raleway', sans-serif;
 	font-size: 11pt;
 	font-weight: 400;
-	color: #363636;
+
 }
 
 .header{
@@ -63,5 +63,37 @@ p{
         font-size: 17px;
 }
 
+.infoSquare{
+    position: absolute;
+    bottom: 2%;
+    left: 0;
+      right: 0;
+      margin: 0 auto;
+    width: 280px;
+    height: 20%;
+    color: #000;
+    border-style: solid;
+    border-color: #000000;
+    border-radius: 6px;
+    border-width: 2px;
+    background-color: white;
+}
 
+.infoTitle{
+    color: black;
+    font-size: 15pt;
+    margin: 0 auto;
+    text-align:  center;
+}
 
+.infoBody{
+    color: black;
+    margin: 0 auto;
+    font-size: 11pt;
+}
+
+.optionSquare{
+    position: absolute;
+    left: 2%;
+    top: 4%
+}

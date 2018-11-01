@@ -248,7 +248,13 @@ function moveSubtree(subtree, xmove, ymove){
   //proccesByLevel(root,function(node){addParameterToNode(node,"total"+rank,0,"kingdom",higerRank)});
 function countChildren(root){
   //adds procesed to every element of the tree
-  proccesByLevel(root,function(node){node.desendece = 0;});
+  proccesByLevel(root,function(node){
+                  node.desendece = 0;
+                  node.totalSplits = 0; 
+                  node.totalMerges = 0;
+                  node.totalRemoves = 0;
+                  node.totalInsertions = 0;
+                });
   memoryTreeIteration(root,disperceChildCount);
   
   memoryTreeIteration(root,setFamiliars);
@@ -256,7 +262,17 @@ function countChildren(root){
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
   rank = "Genus";
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Subgenus";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Tribe";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Subtribe";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Subfamily";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
   rank = "Family";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Superfamily";
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
   rank = "Order";
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
@@ -265,6 +281,8 @@ function countChildren(root){
   rank = "Phylum";
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
   rank = "Infraspecies";
+  memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
+  rank = "Subgenus";
   memoryTreeIteration(root,function(node,parent){subRankCount(node,parent,rank);});
 
 }

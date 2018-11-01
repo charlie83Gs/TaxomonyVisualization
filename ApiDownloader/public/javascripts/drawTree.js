@@ -21,18 +21,27 @@ var initOptions = {
     hsbIncrement: 2,
     hsbBrigthnes: 50,
     hsbbrigthnesIncrement: 7,
-    log_increment: 8,
+    log_increment: 30,
     log_scale: 5,
-    "hierarchy_distance":500,
-    "width" : 300,
+    "circle-padding": 3,
+    "hierarchy_distance":700,
+    "width" : 350,
     "height" : 500,
+    separation: 200,
     "background-color" : undefined,
     "stroke-color" : undefined,
     "indent-stroke" : 0.5,
     "indent-stroke-color" : undefined,
     "hover-color" : undefined,
     "hover-color-rect" : undefined,
-	"text-color": undefined
+	"text-color": undefined,
+	"remove-color":undefined,
+	"add-color":undefined,
+	"split-color":"#f442f1",
+	"merge-color":"#3db1f4",
+	"rename-color":"#FFFFFF",
+	"move-color":"#FFFFFF",
+	"equal-color":"#AAAAAA",
 }
 
 
@@ -113,32 +122,32 @@ function setup() {
 	initOptions["hover-color"] = color(249,211,149);
 	initOptions["text-color"] = color(0,0,0);
 	initOptions["hover-color-rect"] = color(48, 44, 66);
-	
-  
+	initOptions["remove-color"] = color(142, 21, 0);
+	initOptions["add-color"] = color(12, 155, 10);
+
+
 	countChildren(tree);
 	levelList = createRankList(tree);
 	initializeIndentedTree(tree,levelList,initOptions);
 	
+
 	countChildren(tree2);
 	levelList2 = createRankList(tree2);
 	initializeIndentedTree(tree2,levelList2,initOptions);
 	
+
 	calculate_all_merges(levelList,levelList2);
 
-	
 	//console.log(tree);
 	//console.log(levelList);
-  
 }
 function mouseWheel(event) {
 	yPointer -= event.delta*SCROLL_SPEED;
 	//print(event.delta);
 }
-
 function mouseClicked(){
 	click = true;
 }
-
 function windowResized() {
 	resizeCanvas(windowWidth*totalCanvasWidth, windowHeight*totalCanvasHeight);
 	var x = 0;
@@ -153,11 +162,23 @@ function draw() {
 
   //drawIndentedTree(tree, initOptions);
   let base_y = windowWidth/2 - initOptions.width/2;
-  optimizedDrawIndentedTree(tree.visible_lbr,initOptions,base_y-initOptions.hierarchy_distance/2,0);
-  optimizedDrawIndentedTree(tree2.visible_lbr,initOptions,base_y+initOptions.hierarchy_distance/2,0);
+  //optimizedDrawIndentedTree(tree.visible_lbr,initOptions,base_y-initOptions.hierarchy_distance/2,0);
+  //optimizedDrawIndentedTree(tree2.visible_lbr,initOptions,base_y+initOptions.hierarchy_distance/2,0);
+  optimizedDrawIndentedTree(tree.visible_lbr,initOptions,initOptions.separation,0);
+  optimizedDrawIndentedTree(tree2.visible_lbr,initOptions,windowWidth-initOptions.separation-initOptions["width"],0)
 
-	//initOptions.hsbColor = (initOptions.hsbColor +2);
-  //console.log(mouseX +"---"+mouseY);
+  /*levelList["species"].forEach(function(taxon){
+		drawLines(taxon,yPointer,yPointer+windowHeight,initOptions,initOptions.separation,0);
+			
+	});
+
+	levelList2["species"].forEach(function(taxon){
+		drawLines(taxon,yPointer,yPointer+windowHeight,initOptions,initOptions.separation,0);
+			
+	});
+	*/
+	//initOptions.initOptions["width"]or = (initOptions.hsbColor +2);
+  	//console.log(mouseX +"---"+mouseY);
   
 
 
@@ -383,7 +404,7 @@ function optimizedDrawIndentedTree(listByRank,options,xpos,ypos){
 	for(let taxon = 0; taxon < kingdom.length; taxon++){
 		drawCutNode(kingdom[taxon],yPointer,yPointer+windowWidth*totalCanvasWidth,options)
 	}
-	colorMode(HSB,100);
+	//colorMode(HSB,100);
 	drawHierarchyLevel(phylum,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(tclass,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(order,options,yPointer,xpos,ypos);
@@ -396,7 +417,9 @@ function optimizedDrawIndentedTree(listByRank,options,xpos,ypos){
 	drawHierarchyLevel(species,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(subspecies,options,yPointer,xpos,ypos);
 	drawHierarchyLevel(infraspecies,options,yPointer,xpos,ypos);
-	colorMode(RGB, 255);
+	
+	
+	//colorMode(RGB, 255);
 	
 	}
 
@@ -408,6 +431,8 @@ function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 	let iniBrigthnes = (options.hsbBrigthnes + options.hsbbrigthnesIncrement*getValueOfRank(taxons[0].r))%100;
 	//console.log(taxons[0].r+": " + initial);
 	let draws = 0;
+
+
 	for(let taxon = initial; taxon < taxons.length; taxon++){
 		let node = taxons[taxon];
 		
@@ -416,8 +441,15 @@ function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 			fill(iniColor,0,iniBrigthnes);
 			//drawCutNode(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
 			drawOnlyText(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
+			if(interface_variables.squares){
 			drawInside(node, xpos,ypos, options);
-			//fdrawIndent(node, xpos,ypos, options);
+			}
+			if(interface_variables.lines){
+				drawIndent(node, xpos,ypos, options);
+			}
+			drawResumeBars(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
+			//drawResumeDots(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
+			//drawLines(node,yPointer,yPointer+windowHeight*totalCanvasHeight,options,xpos,ypos);
 			//drawNode(node,options);
 			//drawNode(node,options)
 
@@ -425,7 +457,7 @@ function drawHierarchyLevel(taxons,options,pointer,xpos,ypos){
 		if(node.y > yPointer + windowHeight*totalCanvasHeight){break;}
 
 	}
-	//console.log(`Draw calls ${taxons[0].r} ${draws}`);
+	
 	}
 
 function findHead(list, targetY){
@@ -470,8 +502,30 @@ function drawOnlyText(node,initialY,finalY,options,xpos,ypos){
 	let clicked = false;
 	//hover interaction
 	fill(options["text-color"]);
+	if(interface_variables.removed && node.removed){
+		fill(options["remove-color"]);
+	}else if(interface_variables.added && node.added){
+		fill(options["add-color"]);
+	}else{
+		fill(options["text-color"]);
+	}
+
 	if(isOverRect(mouseX +xPointer, mouseY+yPointer,node.x + xpos,node.y + ypos,node.width,options.defaultSize)){
-		fill(options["hover-color"]);
+		fill(options["hover-color"]); 
+
+		//this functions comes from drawMene.js
+		if(showInfo){
+			let author = node.a == "" ? "" : `<br>Author:${node.a}`;
+			let date = (node.ad || node.ad == "") ? "" : `  Date:${node.da}`;
+			let synonim = node.equivalent ? "<br>Synonims: "+ node.equivalent.length : "";
+			let splits = "<br>Splits: "+ node.totalSplits ;
+			let merges = "----Merges: "+ node.totalMerges;
+			let removes = "<br>Removes: "+ node.totalRemoves;
+			let insertions = "----Insertions: "+ node.totalInsertions;
+			showInfo(node.n,`Rank: ${node.r}` + author + date + synonim+splits+merges+removes+insertions);
+		}
+
+
 		if(click && !changed){
 			//keep visible nodes list clean
 			let cleaning_function;
@@ -506,6 +560,45 @@ function drawOnlyText(node,initialY,finalY,options,xpos,ypos){
 	}
 	
 }
+
+function drawLines(node,initialY,finalY,options,xpos,ypos){
+	if(node.equivalent && node.equivalent.length > 1){
+		if(node.split){
+			stroke(options["split-color"]);
+		}else if(node.merge){
+			stroke(options["merge-color"]);
+		}
+		let fuente = node;
+		while(fuente.f.length > 0 && fuente.f[fuente.f.length-1].collapsed){
+						fuente = fuente.f[fuente.f.length-1];
+					}
+		node.equivalent.forEach(
+				function(eq){
+
+					let target = eq;
+					while(target.f.length > 0 && target.f[target.f.length-1].collapsed){
+						target = target.f[target.f.length-1];
+					}
+					//stroke(0);
+					noFill();
+					strokeWeight(1);
+					beginShape();
+					curveVertex(fuente.x + xpos -10 ,fuente.y + ypos);
+					curveVertex(fuente.x + xpos,fuente.y + ypos);
+					curveVertex(fuente.x + xpos +150,fuente.y + ypos);
+					curveVertex(target.x + windowWidth - options.separation - options["width"] - 150,target.y);
+					curveVertex(target.x + windowWidth - options.separation - options["width"],target.y);
+					curveVertex(target.x + windowWidth - options.separation - options["width"] + 10,target.y);
+					endShape();
+
+					//line(fuente.x + xpos,fuente.y + ypos,target.x + windowWidth - options.separation - options["width"],target.y);
+				}
+
+			);
+		
+	}
+}
+
 
 //add element to rendering queue
 function pushIntoUnfolded(node){
@@ -608,8 +701,9 @@ function drawIndent(node,xpos,ypos,options){
 	if(node.f.length > 0){
 	let parentNode = node.f[node.f.length -  1];
 	let defaultYDisp = options.defaultSize/2 + ypos;
-	line(parentNode.x + xpos, node.y + defaultYDisp, node.x + xpos, node.y + defaultYDisp);
-	line(parentNode.x + xpos, parentNode.y + defaultYDisp, parentNode.x + xpos, node.y + defaultYDisp);
+	let defaultXDisp = xpos +options.indent/2;
+	line(parentNode.x + defaultXDisp, node.y + defaultYDisp, node.x + xpos, node.y + defaultYDisp);
+	line(parentNode.x + defaultXDisp, parentNode.y + defaultYDisp + 10, parentNode.x + defaultXDisp, node.y + defaultYDisp);
 	
 	}
 }
@@ -637,4 +731,125 @@ function drawCutNode(node,initialY,finalY,options,xpos,ypos){
 	noStroke();
 	fill(0);
 	
+}
+
+function drawResumeDots(node,initialY,finalY,options,xpos,ypos){
+		if(node.collapsed){
+		let bar_width = options["width"] - node.x;
+		let bar_heigth = node["height"] - options.defaultSize;
+		let min = Math.min(bar_width ,bar_heigth);
+		let max = Math.max(bar_width ,bar_heigth);
+		let ratio = max/min;
+		let density = node.desendece/ratio;
+		let size = 0;
+		if(density > 1){
+			size = min/Math.sqrt(density);
+		}else{
+			size = min;
+		}
+		let radius = size - options["circle-padding"];
+		let local_x = 0 ;
+		let local_x_disp = node.x + xpos;
+		let local_y = 0;
+		let local_y_disp = node.y + ypos + options.defaultSize + size/2;
+		//splits
+		fill(options["split-color"]);
+		let acc = 0;
+		for(let taxon = 0; taxon < node.totalSplits; taxon++){
+			ellipse(local_x + local_x_disp, local_y + local_y_disp,radius,radius);
+			local_x += size;
+			if(local_x > bar_width){
+				local_y+=size;
+				local_x = 0;
+			}
+			acc++;
+			
+		}
+		//merges
+		fill(options["merge-color"]);
+		for(let taxon = 0; taxon < node.totalMerges; taxon++){
+			ellipse(local_x + local_x_disp, local_y + local_y_disp,radius,radius);
+			local_x += size;
+			if(local_x > bar_width){
+				local_y+=size;
+				local_x = 0;
+			}
+			acc++;
+		}
+		//moves
+
+		//removes
+		fill(options["remove-color"]);
+		for(let taxon = 0; taxon < node.totalRemoves; taxon++){
+			ellipse(local_x + local_x_disp, local_y + local_y_disp,radius,radius);
+			local_x += size;
+			if(local_x > bar_width){
+				local_y+=size;
+				local_x = 0;
+			}
+			acc++;
+		}
+		//adds
+		fill(options["add-color"]);
+		for(let taxon = 0; taxon < node.totalInsertions; taxon++){
+			ellipse(local_x + local_x_disp, local_y + local_y_disp,radius,radius);
+			local_x += size;
+			if(local_x > bar_width){
+				local_y+=size;
+				local_x = 0;
+			}
+			acc++;
+		}
+		//no change
+		fill(options["equal-color"]);
+		for(let taxon = 0; taxon < node.desendece - acc; taxon++){
+			ellipse(local_x + local_x_disp, local_y + local_y_disp,radius,radius);
+			local_x += size;
+			if(local_x > bar_width){
+				local_y+=size;
+				local_x = 0;
+			}
+		}
+}
+}
+function drawResumeCircles(node,initialY,finalY,options,xpos,ypos){
+
+}
+
+
+function drawResumeBars(node,initialY,finalY,options,xpos,ypos){
+
+	//necesita cambiarse por value of rank
+	if(node.collapsed && node.r.toLowerCase() != "species"){
+		let bar_width = options["width"] - node.x;
+		let bar_heigth = node["height"] - options.defaultSize;
+		let unit = bar_width/node.desendece;
+		let bar_x = node.x + xpos;
+		let bar_y = node.y + options.defaultSize + ypos;
+
+		//splits
+		fill(options["split-color"]);
+		rect(bar_x, bar_y, node.totalSplits*unit,bar_heigth);
+		bar_x += node.totalSplits*unit;
+		//merges
+		fill(options["merge-color"]);
+		rect(bar_x, bar_y,node.totalMerges*unit,bar_heigth);
+		bar_x += node.totalMerges*unit;
+		//moves
+		rect(bar_x, bar_y,0*unit,bar_heigth);
+		bar_x += 0*unit;
+		//removes
+		fill(options["remove-color"]);
+		rect(bar_x, bar_y, node.totalRemoves*unit,bar_heigth);
+		bar_x += node.totalRemoves*unit;
+		//adds
+		fill(options["add-color"]);
+		rect(bar_x, bar_y, node.totalInsertions*unit,bar_heigth);
+		bar_x += node.totalInsertions*unit;
+		//nonde
+		fill(options["equal-color"]);
+		rect(bar_x, bar_y, bar_width + (node.x + xpos - bar_x)  ,bar_heigth);
+		
+	}
+
 }
