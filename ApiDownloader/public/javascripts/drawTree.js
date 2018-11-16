@@ -21,7 +21,7 @@ var initOptions = {
     hsbIncrement: 2,
     hsbBrigthnes: 50,
     hsbbrigthnesIncrement: 7,
-    log_increment: 30,
+    log_increment: 15,
     log_scale: 5,
     "circle-padding": 3,
     "hierarchy_distance":700,
@@ -175,8 +175,8 @@ function draw() {
 	levelList2["species"].forEach(function(taxon){
 		drawLines(taxon,yPointer,yPointer+windowHeight,initOptions,initOptions.separation,0);
 			
-	});
-	*/
+	});*/
+	
 	//initOptions.initOptions["width"]or = (initOptions.hsbColor +2);
   	//console.log(mouseX +"---"+mouseY);
   

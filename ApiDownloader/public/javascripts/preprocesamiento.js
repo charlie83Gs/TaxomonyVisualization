@@ -117,7 +117,7 @@ function name_changes_left(node_list){
 	node_list.forEach(
 		function(node){
 			let equivalence = node.equivalent.length;
-			if(equivalence > 1){
+			 if(equivalence > 1){
 				node.f.forEach(function(familiar){familiar.totalSplits++});
 				node.equivalent.forEach(function(eq){eq.f.forEach(function(familiar){familiar.totalSplits++})});
 				node.split = true;
@@ -140,7 +140,12 @@ function name_changes_right(node_list){
 	node_list.forEach(
 		function(node){
 			let equivalence = node.equivalent.length;
-			if(equivalence > 1){
+			if(equivalence == 1){
+				if(node.n != node.equivalent[0]){
+					node.renamed = true;
+					node.f.forEach(function(familiar){familiar.renames++});
+				}
+			}else if(equivalence > 1){
 				node.f.forEach(function(familiar){familiar.totalMerges++});
 				node.equivalent.forEach(function(eq){eq.f.forEach(function(familiar){familiar.totalMerges++})});
 				node.merge = true;
@@ -160,6 +165,7 @@ function name_changes_right(node_list){
 }
 
 
+
 function calculate_all_merges(left_tree, rigth_tree){
 	//verificar_name_changes(left_tree["kingdom"],rigth_tree["kingdom"]);
 	//verificar_name_changes(left_tree["phylum"],rigth_tree["phylum"]);
@@ -170,7 +176,10 @@ function calculate_all_merges(left_tree, rigth_tree){
 			name_changes_left(left_tree[rank]);
 			name_changes_right(rigth_tree[rank]);
 		}
-		);
+	);
+
+
+	
 	/*verificar_name_changes(left_tree["class"],rigth_tree["class"]);
 	verificar_name_changes(left_tree["order"],rigth_tree["order"]);
 	verificar_name_changes(left_tree["superfamily"],rigth_tree["superfamily"]);
